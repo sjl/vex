@@ -12,9 +12,11 @@ don't touch it.
 
 ## Package `VEX`
 
-### `VEC2`
+### `VEC2` (struct)
 
-`#<STANDARD-CLASS DOCPARSER:STRUCT-NODE>`
+A two-dimensional vector of `REAL`s.
+
+Slots: `X`, `Y`
 
 ### `VEC2-ADD` (function)
 
@@ -113,9 +115,11 @@ Destructively update `v` by subtracting `x` and `y`, returning `v`.
 
     (VEC2-Y VALUE INSTANCE)
 
-### `VEC2D`
+### `VEC2D` (struct)
 
-`#<STANDARD-CLASS DOCPARSER:STRUCT-NODE>`
+A two-dimensional vector of `DOUBLE-FLOAT`s.
+
+Slots: `X`, `Y`
 
 ### `VEC2D-ADD` (function)
 
@@ -214,9 +218,11 @@ Destructively update `v` by subtracting `x` and `y`, returning `v`.
 
     (VEC2D-Y VALUE INSTANCE)
 
-### `VEC2F`
+### `VEC2F` (struct)
 
-`#<STANDARD-CLASS DOCPARSER:STRUCT-NODE>`
+A two-dimensional vector of `SINGLE-FLOAT`s.
+
+Slots: `X`, `Y`
 
 ### `VEC2F-ADD` (function)
 
@@ -315,9 +321,11 @@ Destructively update `v` by subtracting `x` and `y`, returning `v`.
 
     (VEC2F-Y VALUE INSTANCE)
 
-### `VEC2I`
+### `VEC2I` (struct)
 
-`#<STANDARD-CLASS DOCPARSER:STRUCT-NODE>`
+A two-dimensional vector of `FIXNUM`s.
+
+Slots: `X`, `Y`
 
 ### `VEC2I-ADD` (function)
 

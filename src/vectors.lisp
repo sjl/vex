@@ -23,6 +23,9 @@
   `(progn
     (declaim (inline ,name))
     (defstruct (,name (:constructor ,name ,arglist))
+      ,(format nil "A ~R-dimensional vector of `~A`s."
+               (length slots)
+               type)
       ,@(loop :for slot :in slots :collect `(,slot ,default :type ,type)))
     (declaim (notinline ,name))))
 
