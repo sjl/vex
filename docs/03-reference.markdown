@@ -24,6 +24,12 @@ Slots: `X`, `Y`
 
 Add `v1` and `v2` componentwise, returning a new vector.
 
+### `VEC2-ADD!` (function)
+
+    (VEC2-ADD! V1 V2)
+
+Destructively update `v1` by adding `v2` componentwise, returning `v1`.
+
 ### `VEC2-ADD*` (function)
 
     (VEC2-ADD* V X Y)
@@ -53,6 +59,12 @@ Return the angle of `v`.
     (VEC2-DIV V SCALAR)
 
 Divide the components of `v` by `scalar`, returning a new vector.
+
+### `VEC2-DIV!` (function)
+
+    (VEC2-DIV! V SCALAR)
+
+Destructively divide the components of `v` by `scalar`, returning `v`.
 
 ### `VEC2-EQL` (function)
 
@@ -89,11 +101,23 @@ Return the magnitude of `v`.
 
 Multiply the components of `v` by `scalar`, returning a new vector.
 
+### `VEC2-MUL!` (function)
+
+    (VEC2-MUL! V SCALAR)
+
+Destructively multiply the components of `v` by `scalar`, returning `v`.
+
 ### `VEC2-SUB` (function)
 
     (VEC2-SUB V1 V2)
 
 Subtract `v1` and `v2` componentwise, returning a new vector.
+
+### `VEC2-SUB!` (function)
+
+    (VEC2-SUB! V1 V2)
+
+Destructively update `v1` by subtracting `v2` componentwise, returning `v1`.
 
 ### `VEC2-SUB*` (function)
 
@@ -127,6 +151,12 @@ Slots: `X`, `Y`
 
 Add `v1` and `v2` componentwise, returning a new vector.
 
+### `VEC2D-ADD!` (function)
+
+    (VEC2D-ADD! V1 V2)
+
+Destructively update `v1` by adding `v2` componentwise, returning `v1`.
+
 ### `VEC2D-ADD*` (function)
 
     (VEC2D-ADD* V X Y)
@@ -156,6 +186,12 @@ Return the angle of `v`.
     (VEC2D-DIV V SCALAR)
 
 Divide the components of `v` by `scalar`, returning a new vector.
+
+### `VEC2D-DIV!` (function)
+
+    (VEC2D-DIV! V SCALAR)
+
+Destructively divide the components of `v` by `scalar`, returning `v`.
 
 ### `VEC2D-EQL` (function)
 
@@ -192,11 +228,23 @@ Return the magnitude of `v`.
 
 Multiply the components of `v` by `scalar`, returning a new vector.
 
+### `VEC2D-MUL!` (function)
+
+    (VEC2D-MUL! V SCALAR)
+
+Destructively multiply the components of `v` by `scalar`, returning `v`.
+
 ### `VEC2D-SUB` (function)
 
     (VEC2D-SUB V1 V2)
 
 Subtract `v1` and `v2` componentwise, returning a new vector.
+
+### `VEC2D-SUB!` (function)
+
+    (VEC2D-SUB! V1 V2)
+
+Destructively update `v1` by subtracting `v2` componentwise, returning `v1`.
 
 ### `VEC2D-SUB*` (function)
 
@@ -230,6 +278,12 @@ Slots: `X`, `Y`
 
 Add `v1` and `v2` componentwise, returning a new vector.
 
+### `VEC2F-ADD!` (function)
+
+    (VEC2F-ADD! V1 V2)
+
+Destructively update `v1` by adding `v2` componentwise, returning `v1`.
+
 ### `VEC2F-ADD*` (function)
 
     (VEC2F-ADD* V X Y)
@@ -259,6 +313,12 @@ Return the angle of `v`.
     (VEC2F-DIV V SCALAR)
 
 Divide the components of `v` by `scalar`, returning a new vector.
+
+### `VEC2F-DIV!` (function)
+
+    (VEC2F-DIV! V SCALAR)
+
+Destructively divide the components of `v` by `scalar`, returning `v`.
 
 ### `VEC2F-EQL` (function)
 
@@ -295,11 +355,23 @@ Return the magnitude of `v`.
 
 Multiply the components of `v` by `scalar`, returning a new vector.
 
+### `VEC2F-MUL!` (function)
+
+    (VEC2F-MUL! V SCALAR)
+
+Destructively multiply the components of `v` by `scalar`, returning `v`.
+
 ### `VEC2F-SUB` (function)
 
     (VEC2F-SUB V1 V2)
 
 Subtract `v1` and `v2` componentwise, returning a new vector.
+
+### `VEC2F-SUB!` (function)
+
+    (VEC2F-SUB! V1 V2)
+
+Destructively update `v1` by subtracting `v2` componentwise, returning `v1`.
 
 ### `VEC2F-SUB*` (function)
 
@@ -333,6 +405,12 @@ Slots: `X`, `Y`
 
 Add `v1` and `v2` componentwise, returning a new vector.
 
+### `VEC2I-ADD!` (function)
+
+    (VEC2I-ADD! V1 V2)
+
+Destructively update `v1` by adding `v2` componentwise, returning `v1`.
+
 ### `VEC2I-ADD*` (function)
 
     (VEC2I-ADD* V X Y)
@@ -362,6 +440,12 @@ Return the angle of `v`.
     (VEC2I-DIV V SCALAR)
 
 Divide the components of `v` by `scalar`, returning a new vector.
+
+### `VEC2I-DIV!` (function)
+
+    (VEC2I-DIV! V SCALAR)
+
+Destructively divide the components of `v` by `scalar`, returning `v`.
 
 ### `VEC2I-EQL` (function)
 
@@ -398,11 +482,23 @@ Return the magnitude of `v`.
 
 Multiply the components of `v` by `scalar`, returning a new vector.
 
+### `VEC2I-MUL!` (function)
+
+    (VEC2I-MUL! V SCALAR)
+
+Destructively multiply the components of `v` by `scalar`, returning `v`.
+
 ### `VEC2I-SUB` (function)
 
     (VEC2I-SUB V1 V2)
 
 Subtract `v1` and `v2` componentwise, returning a new vector.
+
+### `VEC2I-SUB!` (function)
+
+    (VEC2I-SUB! V1 V2)
+
+Destructively update `v1` by subtracting `v2` componentwise, returning `v1`.
 
 ### `VEC2I-SUB*` (function)
 

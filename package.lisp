@@ -40,6 +40,23 @@
     #:vec2d-div*
     #:vec2i-div*
 
+    #:vec2-add!
+    #:vec2f-add!
+    #:vec2d-add!
+    #:vec2i-add!
+    #:vec2-sub!
+    #:vec2f-sub!
+    #:vec2d-sub!
+    #:vec2i-sub!
+    #:vec2-mul!
+    #:vec2f-mul!
+    #:vec2d-mul!
+    #:vec2i-mul!
+    #:vec2-div!
+    #:vec2f-div!
+    #:vec2d-div!
+    #:vec2i-div!
+
     #:vec2-add*!
     #:vec2f-add*!
     #:vec2d-add*!
