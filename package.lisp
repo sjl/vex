@@ -1,5 +1,5 @@
 (defpackage #:vex
-  (:use #:cl)
+  (:use #:cl #:vex.quickutils)
   (:export
     #:vec2
     #:vec2f
@@ -112,4 +112,27 @@
     #:vec2-y
     #:vec2f-y
     #:vec2d-y
-    #:vec2i-y))
+    #:vec2i-y
+    
+    
+    #:vec2-xy
+    #:vec2f-xy
+    #:vec2d-xy
+    #:vec2i-xy
+
+    #:vec2-yx
+    #:vec2f-yx
+    #:vec2d-yx
+    #:vec2i-yx
+
+    #:vec2-xy!
+    #:vec2f-xy!
+    #:vec2d-xy!
+    #:vec2i-xy!
+    #:vec2-yx!
+
+    #:vec2f-yx!
+    #:vec2d-yx!
+    #:vec2i-yx!
+
+    ))

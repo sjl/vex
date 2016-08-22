@@ -34,3 +34,7 @@ test-ccl:
 test-ecl:
 	echo; figlet -kf roman 'ECL' | sed -Ee 's/ +$$//' | tr -s '\n' | lolcat --freq=0.25; echo
 	ros run -L ecl --load test/run.lisp
+
+# Vendoring -------------------------------------------------------------------
+vendor/quickutils.lisp: vendor/make-quickutils.lisp
+	cd vendor && ros run -L sbcl --load make-quickutils.lisp  --eval '(quit)'

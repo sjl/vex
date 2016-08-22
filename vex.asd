@@ -10,7 +10,9 @@
   :depends-on ()
 
   :serial t
-  :components ((:file "package")
+  :components ((:module "vendor"
+                :components ((:file "quickutils")))
+               (:file "package")
                (:module "src"
                 :serial t
                 :components ((:file "vectors"))))

@@ -135,9 +135,33 @@ Destructively update `v` by subtracting `x` and `y`, returning `v`.
 
     (VEC2-X VALUE INSTANCE)
 
+### `VEC2-XY` (function)
+
+    (VEC2-XY V)
+
+Swizzle `v`, returning a new `vec2` of its `x` and `y` components.
+
+### `VEC2-XY!` (function)
+
+    (VEC2-XY! V)
+
+Swizzle `v` in-place and return it, setting its components to `x` and `y`.
+
 ### `VEC2-Y` (function)
 
     (VEC2-Y VALUE INSTANCE)
+
+### `VEC2-YX` (function)
+
+    (VEC2-YX V)
+
+Swizzle `v`, returning a new `vec2` of its `y` and `x` components.
+
+### `VEC2-YX!` (function)
+
+    (VEC2-YX! V)
+
+Swizzle `v` in-place and return it, setting its components to `y` and `x`.
 
 ### `VEC2D` (struct)
 
@@ -262,9 +286,33 @@ Destructively update `v` by subtracting `x` and `y`, returning `v`.
 
     (VEC2D-X VALUE INSTANCE)
 
+### `VEC2D-XY` (function)
+
+    (VEC2D-XY V)
+
+Swizzle `v`, returning a new `vec2d` of its `x` and `y` components.
+
+### `VEC2D-XY!` (function)
+
+    (VEC2D-XY! V)
+
+Swizzle `v` in-place and return it, setting its components to `x` and `y`.
+
 ### `VEC2D-Y` (function)
 
     (VEC2D-Y VALUE INSTANCE)
+
+### `VEC2D-YX` (function)
+
+    (VEC2D-YX V)
+
+Swizzle `v`, returning a new `vec2d` of its `y` and `x` components.
+
+### `VEC2D-YX!` (function)
+
+    (VEC2D-YX! V)
+
+Swizzle `v` in-place and return it, setting its components to `y` and `x`.
 
 ### `VEC2F` (struct)
 
@@ -389,9 +437,33 @@ Destructively update `v` by subtracting `x` and `y`, returning `v`.
 
     (VEC2F-X VALUE INSTANCE)
 
+### `VEC2F-XY` (function)
+
+    (VEC2F-XY V)
+
+Swizzle `v`, returning a new `vec2f` of its `x` and `y` components.
+
+### `VEC2F-XY!` (function)
+
+    (VEC2F-XY! V)
+
+Swizzle `v` in-place and return it, setting its components to `x` and `y`.
+
 ### `VEC2F-Y` (function)
 
     (VEC2F-Y VALUE INSTANCE)
+
+### `VEC2F-YX` (function)
+
+    (VEC2F-YX V)
+
+Swizzle `v`, returning a new `vec2f` of its `y` and `x` components.
+
+### `VEC2F-YX!` (function)
+
+    (VEC2F-YX! V)
+
+Swizzle `v` in-place and return it, setting its components to `y` and `x`.
 
 ### `VEC2I` (struct)
 
@@ -516,7 +588,31 @@ Destructively update `v` by subtracting `x` and `y`, returning `v`.
 
     (VEC2I-X VALUE INSTANCE)
 
+### `VEC2I-XY` (function)
+
+    (VEC2I-XY V)
+
+Swizzle `v`, returning a new `vec2i` of its `x` and `y` components.
+
+### `VEC2I-XY!` (function)
+
+    (VEC2I-XY! V)
+
+Swizzle `v` in-place and return it, setting its components to `x` and `y`.
+
 ### `VEC2I-Y` (function)
 
     (VEC2I-Y VALUE INSTANCE)
+
+### `VEC2I-YX` (function)
+
+    (VEC2I-YX V)
+
+Swizzle `v`, returning a new `vec2i` of its `y` and `x` components.
+
+### `VEC2I-YX!` (function)
+
+    (VEC2I-YX! V)
+
+Swizzle `v` in-place and return it, setting its components to `y` and `x`.
 
