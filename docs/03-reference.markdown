@@ -131,6 +131,18 @@ Subtract `x` and `y` from the components of `v`, returning a new vector.
 
 Destructively update `v` by subtracting `x` and `y`, returning `v`.
 
+### `VEC2-UNIT-X` (function)
+
+    (VEC2-UNIT-X)
+
+Return a unit vector in the X direction.
+
+### `VEC2-UNIT-Y` (function)
+
+    (VEC2-UNIT-Y)
+
+Return a unit vector in the Y direction.
+
 ### `VEC2-X` (function)
 
     (VEC2-X VALUE INSTANCE)
@@ -162,6 +174,12 @@ Swizzle `v`, returning a new `vec2` of its `y` and `x` components.
     (VEC2-YX! V)
 
 Swizzle `v` in-place and return it, setting its components to `y` and `x`.
+
+### `VEC2-ZERO` (function)
+
+    (VEC2-ZERO)
+
+Return a fresh zero vector.
 
 ### `VEC2D` (struct)
 
@@ -282,6 +300,18 @@ Subtract `x` and `y` from the components of `v`, returning a new vector.
 
 Destructively update `v` by subtracting `x` and `y`, returning `v`.
 
+### `VEC2D-UNIT-X` (function)
+
+    (VEC2D-UNIT-X)
+
+Return a unit vector in the X direction.
+
+### `VEC2D-UNIT-Y` (function)
+
+    (VEC2D-UNIT-Y)
+
+Return a unit vector in the Y direction.
+
 ### `VEC2D-X` (function)
 
     (VEC2D-X VALUE INSTANCE)
@@ -313,6 +343,12 @@ Swizzle `v`, returning a new `vec2d` of its `y` and `x` components.
     (VEC2D-YX! V)
 
 Swizzle `v` in-place and return it, setting its components to `y` and `x`.
+
+### `VEC2D-ZERO` (function)
+
+    (VEC2D-ZERO)
+
+Return a fresh zero vector.
 
 ### `VEC2F` (struct)
 
@@ -433,6 +469,18 @@ Subtract `x` and `y` from the components of `v`, returning a new vector.
 
 Destructively update `v` by subtracting `x` and `y`, returning `v`.
 
+### `VEC2F-UNIT-X` (function)
+
+    (VEC2F-UNIT-X)
+
+Return a unit vector in the X direction.
+
+### `VEC2F-UNIT-Y` (function)
+
+    (VEC2F-UNIT-Y)
+
+Return a unit vector in the Y direction.
+
 ### `VEC2F-X` (function)
 
     (VEC2F-X VALUE INSTANCE)
@@ -464,6 +512,12 @@ Swizzle `v`, returning a new `vec2f` of its `y` and `x` components.
     (VEC2F-YX! V)
 
 Swizzle `v` in-place and return it, setting its components to `y` and `x`.
+
+### `VEC2F-ZERO` (function)
+
+    (VEC2F-ZERO)
+
+Return a fresh zero vector.
 
 ### `VEC2I` (struct)
 
@@ -584,6 +638,18 @@ Subtract `x` and `y` from the components of `v`, returning a new vector.
 
 Destructively update `v` by subtracting `x` and `y`, returning `v`.
 
+### `VEC2I-UNIT-X` (function)
+
+    (VEC2I-UNIT-X)
+
+Return a unit vector in the X direction.
+
+### `VEC2I-UNIT-Y` (function)
+
+    (VEC2I-UNIT-Y)
+
+Return a unit vector in the Y direction.
+
 ### `VEC2I-X` (function)
 
     (VEC2I-X VALUE INSTANCE)
@@ -615,4 +681,10 @@ Swizzle `v`, returning a new `vec2i` of its `y` and `x` components.
     (VEC2I-YX! V)
 
 Swizzle `v` in-place and return it, setting its components to `y` and `x`.
+
+### `VEC2I-ZERO` (function)
+
+    (VEC2I-ZERO)
+
+Return a fresh zero vector.
 

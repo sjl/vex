@@ -6,6 +6,21 @@
     #:vec2d
     #:vec2i
 
+    #:vec2-zero
+    #:vec2f-zero
+    #:vec2d-zero
+    #:vec2i-zero
+
+    #:vec2-unit-x
+    #:vec2f-unit-x
+    #:vec2d-unit-x
+    #:vec2i-unit-x
+
+    #:vec2-unit-y
+    #:vec2f-unit-y
+    #:vec2d-unit-y
+    #:vec2i-unit-y
+
     #:vec2-add
     #:vec2f-add
     #:vec2d-add

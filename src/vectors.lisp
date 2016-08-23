@@ -130,6 +130,9 @@
         (div (symb vec-type '-div))
         (div! (symb vec-type '-div!))
         (eql (symb vec-type '-eql))
+        (zero (symb vec-type '-zero))
+        (unit-x (symb vec-type '-unit-x))
+        (unit-y (symb vec-type '-unit-y))
         (magdir (symb vec-type '-magdir))
         (magnitude (symb vec-type '-magnitude))
         (length (symb vec-type '-length))
@@ -138,6 +141,10 @@
         (set! (symb vec-type '-set!)))
     `(progn
       (declaim
+        (ftype (function ()
+                         (values ,vec-type &optional))
+               ,zero ,unit-x ,unit-y)
+
         (ftype (function (,element-type ,element-type)
                          (values ,vec-type &optional))
                ,magdir)
@@ -166,6 +173,21 @@
 
       (with-fns
         ,vec-type ,element-type
+
+        (defun ,zero ()
+          "Return a fresh zero vector."
+          (vec (coerce 0 ',element-type)
+               (coerce 0 ',element-type)))
+
+        (defun ,unit-x ()
+          "Return a unit vector in the X direction."
+          (vec (coerce 1 ',element-type)
+               (coerce 0 ',element-type)))
+
+        (defun ,unit-y ()
+          "Return a unit vector in the Y direction."
+          (vec (coerce 0 ',element-type)
+               (coerce 1 ',element-type)))
 
         (defun ,set! (v x y)
           "Destructively set the components of `v` to `x` and `y`, returning `v`."
@@ -279,6 +301,7 @@
 
 ;;;; Scratch ------------------------------------------------------------------
 ; (declaim (optimize (speed 3) (safety 1) (debug 1)))
+; (declaim (optimize (speed 3) (safety 0) (debug 0)))
 ; vec2i-eql
 ; vec2f-add
 ; vec2f-add*
@@ -295,3 +318,4 @@
 ; vec2f-yx!
 ; vec2f
 ; vec2f-div!
+; vec2f-unit-y
