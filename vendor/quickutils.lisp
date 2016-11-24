@@ -2,7 +2,7 @@
 ;;;; See http://quickutil.org for details.
 
 ;;;; To regenerate:
-;;;; (qtlc:save-utils-as "quickutils.lisp" :utilities '(:WITH-GENSYMS :ONCE-ONLY :MAP-PERMUTATIONS :CURRY :RCURRY :SYMB) :ensure-package T :package "VEX.QUICKUTILS")
+;;;; (qtlc:save-utils-as "quickutils.lisp" :utilities '(:WITH-GENSYMS :ONCE-ONLY :MAP-PERMUTATIONS :MAKE-GENSYM :DEFINE-CONSTANT :CURRY :RCURRY :SYMB) :ensure-package T :package "VEX.QUICKUTILS")
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (unless (find-package "VEX.QUICKUTILS")
@@ -16,8 +16,9 @@
   (setf *utilities* (union *utilities* '(:STRING-DESIGNATOR :WITH-GENSYMS
                                          :MAKE-GENSYM-LIST :ONCE-ONLY
                                          :ENSURE-FUNCTION :MAP-COMBINATIONS
-                                         :MAP-PERMUTATIONS :CURRY :RCURRY
-                                         :MKSTR :SYMB))))
+                                         :MAP-PERMUTATIONS :MAKE-GENSYM
+                                         :DEFINE-CONSTANT :CURRY :RCURRY :MKSTR
+                                         :SYMB))))
 
   (deftype string-designator ()
     "A string designator type. A string designator is either a string, a symbol,
@@ -218,6 +219,52 @@ length of the delimited subsequence."
                                   :copy nil)))))))
   
 
+  (defun make-gensym (name)
+    "If `name` is a non-negative integer, calls `gensym` using it. Otherwise `name`
+must be a string designator, in which case calls `gensym` using the designated
+string as the argument."
+    (gensym (if (typep name '(integer 0))
+                name
+                (string name))))
+  
+
+  (defun %reevaluate-constant (name value test)
+    (if (not (boundp name))
+        value
+        (let ((old (symbol-value name))
+              (new value))
+          (if (not (constantp name))
+              (prog1 new
+                (cerror "Try to redefine the variable as a constant."
+                        "~@<~S is an already bound non-constant variable ~
+                       whose value is ~S.~:@>" name old))
+              (if (funcall test old new)
+                  old
+                  (restart-case
+                      (error "~@<~S is an already defined constant whose value ~
+                              ~S is not equal to the provided initial value ~S ~
+                              under ~S.~:@>" name old new test)
+                    (ignore ()
+                      :report "Retain the current value."
+                      old)
+                    (continue ()
+                      :report "Try to redefine the constant."
+                      new)))))))
+
+  (defmacro define-constant (name initial-value &key (test ''eql) documentation)
+    "Ensures that the global variable named by `name` is a constant with a value
+that is equal under `test` to the result of evaluating `initial-value`. `test` is a
+function designator that defaults to `eql`. If `documentation` is given, it
+becomes the documentation string of the constant.
+
+Signals an error if `name` is already a bound non-constant variable.
+
+Signals an error if `name` is already a constant variable whose value is not
+equal under `test` to result of evaluating `initial-value`."
+    `(defconstant ,name (%reevaluate-constant ',name ,initial-value ,test)
+       ,@(when documentation `(,documentation))))
+  
+
   (defun curry (function &rest arguments)
     "Returns a function that applies `arguments` and the arguments
 it is called with to `function`."
@@ -265,7 +312,7 @@ See also: `symbolicate`"
     (values (intern (apply #'mkstr args))))
   
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  (export '(with-gensyms with-unique-names once-only map-permutations curry
-            rcurry symb)))
+  (export '(with-gensyms with-unique-names once-only map-permutations
+            make-gensym define-constant curry rcurry symb)))
 
 ;;;; END OF quickutils.lisp ;;;;

@@ -6,6 +6,8 @@
                :with-gensyms
                :once-only
                :map-permutations
+               :make-gensym
+               :define-constant
                ; :compose
                :curry
                :rcurry

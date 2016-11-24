@@ -1,5 +1,7 @@
 (in-package #:vex)
 
+(declaim (optimize (speed 3) (safety 0) (debug 0)))
+
 
 ;;;; Utils --------------------------------------------------------------------
 (eval-when (:compile-toplevel :load-toplevel :execute)
@@ -23,8 +25,85 @@
   `(progn
      ,@(loop :for name :in names :collect `(defun ,name ,@rest))))
 
+(define-constant +setf-expander-help+
+  "Destructively set the components of `v` to particular values.
+
+  The values should be given as a `(values ...)` form.
+
+  If only fewer values than components are given, the remaining values default
+  to the last given one.
+
+  If no values are given, both all components are set to zero.
+
+  Examples:
+
+    (defparameter *foo* (vec2f 0.0 0.0))
+    ; foo = [0.0, 0.0]
+
+    (setf (vec2f *foo*) (values 1.0 2.0))
+    ; foo = [1.0, 2.0]
+
+    (setf (vec2f *foo*) (values 8.0))
+    ; foo = [8.0, 8.0]
+
+    (setf (vec2f *foo*) (values))
+    ; foo = [0.0, 0.0]
+
+    (defparameter *bar* (vec2f 3.0 9.0))
+    ; foo = [0.0, 0.0]
+    ; bar = [3.0, 9.0]
+
+    (rotatef (vec2f *foo*) (vec2f *bar*))
+    ; foo = [3.0, 9.0]
+    ; bar = [0.0, 0.0]
+
+  "
+  :test #'equal)
+
+
+(declaim (inline wrap-bounds))
+(defun wrap-bounds (n lower upper)
+  (let* ((range (1+ (- upper lower)))
+         (n (mod (- n lower) range)))
+    (if (minusp n)
+      (+ upper 1 n)
+      (+ lower n))))
+
+
+(deftype unsigned-fixnum ()
+  '(and (integer 0) fixnum))
+
 
 ;;;; Structs ------------------------------------------------------------------
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defun setf-expander-form (name slots default)
+    `(define-setf-expander ,name (v)
+      #.+setf-expander-help+
+      ;; turn back now
+      (let ((val-vars (mapcar #'make-gensym ',slots))
+            (actual-vars (mapcar #'make-gensym ',slots))
+            (accessors ',(mapcar (lambda (slot)
+                                   (symb name '- slot))
+                                 slots)))
+        (with-gensyms (vec)
+          (values `(,vec)
+                  `(,v)
+                  `(,@val-vars)
+                  `(let* ,(loop
+                            :for prev-actual = ,default :then actual
+                            :for val :in val-vars
+                            :for actual :in actual-vars
+                            :collect `(,actual (or ,val ,prev-actual)))
+                    (setf
+                      ,@(loop :for actual :in actual-vars
+                              :for accessor :in accessors
+                              :collect `(,accessor ,vec)
+                              :collect actual))
+                    (values ,@actual-vars))
+                  `(values
+                    ,@(loop :for accessor :in accessors
+                            :collect `(,accessor ,vec)))))))))
+
 (defmacro defvec (name slots arglist type default)
   `(progn
     (declaim (inline ,name))
@@ -32,7 +111,9 @@
       ,(format nil "A ~R-dimensional vector of `~A`s."
                (length slots)
                type)
-      ,@(loop :for slot :in slots :collect `(,slot ,default :type ,type)))))
+      ,@(loop :for slot :in slots :collect `(,slot ,default :type ,type)))
+    ,(setf-expander-form name slots default)
+    ',name))
 
 (defmacro defvec2 (name type default)
   `(defvec ,name (x y) (&optional (x ,default) (y x)) ,type ,default))
@@ -47,17 +128,35 @@
 (defvec2 vec2 real 0)
 (defvec2 vec2f single-float 0f0)
 (defvec2 vec2d double-float 0d0)
-(defvec2 vec2i fixnum 0)
+(defvec2 vec2i integer 0)
+(defvec2 vec2s fixnum 0)
+(defvec2 vec2u unsigned-fixnum 0)
+(defvec2 vec2u8 (unsigned-byte 8) 0)
+(defvec2 vec2u16 (unsigned-byte 16) 0)
+(defvec2 vec2u32 (unsigned-byte 32) 0)
+(defvec2 vec2u64 (unsigned-byte 64) 0)
+(defvec2 vec2s8 (signed-byte 8) 0)
+(defvec2 vec2s16 (signed-byte 16) 0)
+(defvec2 vec2s32 (signed-byte 32) 0)
+(defvec2 vec2s64 (signed-byte 64) 0)
 
 (defvec3 vec3 real 0)
 (defvec3 vec3f single-float 0f0)
 (defvec3 vec3d double-float 0d0)
 (defvec3 vec3i fixnum 0)
+(defvec3 vec3u8 (unsigned-byte 8) 0)
+(defvec3 vec3u16 (unsigned-byte 16) 0)
+(defvec3 vec3u32 (unsigned-byte 32) 0)
+(defvec3 vec3u64 (unsigned-byte 64) 0)
 
 (defvec4 vec4 real 0)
 (defvec4 vec4f single-float 0f0)
 (defvec4 vec4d double-float 0d0)
 (defvec4 vec4i fixnum 0)
+(defvec4 vec4u8 (unsigned-byte 8) 0)
+(defvec4 vec4u16 (unsigned-byte 16) 0)
+(defvec4 vec4u32 (unsigned-byte 32) 0)
+(defvec4 vec4u64 (unsigned-byte 64) 0)
 
 
 ;;;; Operations ---------------------------------------------------------------
@@ -102,19 +201,41 @@
 
 
 (defmacro with-fns (vec-type element-type &body body)
-  `(macrolet
-    ((vec (&rest args) `(,',vec-type ,@args))
-     (vec-x (v) `(,(symb ',vec-type '-x) ,v))
-     (vec-y (v) `(,(symb ',vec-type '-y) ,v))
-     (vec-z (v) `(,(symb ',vec-type '-z) ,v))
-     (vec-w (v) `(,(symb ',vec-type '-w) ,v))
-     ,(if (eq element-type 'fixnum)
-        `(wrap (x) `(logand most-positive-fixnum ,x))
-        `(wrap (x) x))
-     ,(if (eq element-type 'fixnum)
-        `(// (x y) `(floor ,x ,y))
-        `(// (x y) `(/ ,x ,y))))
-    ,@body))
+  (let ((vec-x (symb vec-type '-x))
+        (vec-y (symb vec-type '-y))
+        (vec-z (symb vec-type '-z))
+        (vec-w (symb vec-type '-w)))
+    `(let ((vec-x ',vec-x)
+           (vec-y ',vec-y)
+           (vec-z ',vec-z)
+           (vec-w ',vec-w))
+      (declare (ignorable vec-x vec-y vec-z vec-w))
+      (macrolet
+          ((vec (&rest args) `(,',vec-type ,@args))
+           (vec-x (v) `(,',vec-x ,v))
+           (vec-y (v) `(,',vec-y ,v))
+           (vec-z (v) `(,',vec-z ,v))
+           (vec-w (v) `(,',vec-w ,v))
+           (wrap (x)
+             ,(cond
+                ((eq element-type 'integer)
+                 `x)
+                ((eq element-type 'fixnum)
+                 ``(wrap-bounds ,x 0 most-positive-fixnum))
+                ((eq element-type 'unsigned-fixnum)
+                 ``(wrap-bounds ,x 0 most-positive-fixnum))
+                ((subtypep element-type '(unsigned-byte *))
+                 ``(wrap-bounds ,x 0 ,,(1- (expt 2 (second element-type)))))
+                ((subtypep element-type '(signed-byte *))
+                 ``(wrap-bounds ,x
+                    ,,(- (expt 2 (1- (second element-type))))
+                    ,,(1- (expt 2 (1- (second element-type))))))
+                (t `x)))
+           (// (x y)
+             ,(if (subtypep element-type 'integer)
+                ``(floor ,x ,y)
+                ``(/ ,x ,y))))
+        ,@body))))
 
 (defmacro defvec2ops (vec-type element-type)
   (let ((add (symb vec-type '-add))
@@ -138,7 +259,8 @@
         (length (symb vec-type '-length))
         (angle (symb vec-type '-angle))
         (direction (symb vec-type '-direction))
-        (set! (symb vec-type '-set!)))
+        (abs (symb vec-type '-abs))
+        (abs! (symb vec-type '-abs!)))
     `(progn
       (declaim
         (ftype (function ()
@@ -153,20 +275,24 @@
                          (values boolean &optional))
                ,eql)
 
+        (ftype (function (,vec-type)
+                         (values ,vec-type &optional))
+               ,abs ,abs!)
+
         (ftype (function (,vec-type ,vec-type)
                          (values ,vec-type &optional))
                ,add ,sub ,add! ,sub!)
 
-        (ftype (function (,vec-type ,element-type ,element-type)
+        (ftype (function (,vec-type ,element-type &optional ,element-type)
                          (values ,vec-type &optional))
-               ,add* ,add*! ,sub* ,sub*! ,set!)
+               ,add* ,add*! ,sub* ,sub*!)
 
         (ftype (function (,vec-type ,element-type)
                          (values ,vec-type &optional))
                ,mul ,div ,mul! ,div!)
 
         (ftype (function (,vec-type)
-                         ,(if (eq 'fixnum element-type)
+                         ,(if (subtypep element-type 'integer)
                             `(values real &optional)
                             `(values ,element-type &optional)))
                ,magnitude ,length ,angle ,direction))
@@ -180,27 +306,66 @@
                (coerce 0 ',element-type)))
 
         (defun ,unit-x ()
-          "Return a unit vector in the X direction."
+          "Return a fresh unit vector in the X direction."
           (vec (coerce 1 ',element-type)
                (coerce 0 ',element-type)))
 
         (defun ,unit-y ()
-          "Return a unit vector in the Y direction."
+          "Return a fresh unit vector in the Y direction."
           (vec (coerce 0 ',element-type)
                (coerce 1 ',element-type)))
 
-        (defun ,set! (v x y)
-          "Destructively set the components of `v` to `x` and `y`, returning `v`."
-          (setf (vec-x v) x
-                (vec-y v) y)
-          v)
+        (define-setf-expander ,vec-type (v)
+          "Destructively set the components of `v` to particular values.
 
-        (defun ,magdir (magnitude direction)
-          "Create a fresh vector with the given `magnitude` and `direction`."
-          ;; todo figure this out for integer vectors
-          (vec
-            (* magnitude (cos direction))
-            (* magnitude (sin direction))))
+  The values should be given as a `(values x y)` form.
+  If only one value is given, both `x` and `y` are set to it.
+  If no values are given, both `x` and `y` are set to zero.
+
+  Examples:
+
+    (defparameter *foo* (vec2f 0.0 0.0))
+    ; foo = [0.0, 0.0]
+
+    (setf (vec2f *foo*) (values 1.0 2.0))
+    ; foo = [1.0, 2.0]
+
+    (setf (vec2f *foo*) (values 8.0))
+    ; foo = [8.0, 8.0]
+
+    (setf (vec2f *foo*) (values))
+    ; foo = [0.0, 0.0]
+
+    (defparameter *bar* (vec2f 3.0 9.0))
+    ; foo = [0.0, 0.0]
+    ; bar = [3.0, 9.0]
+
+    (rotatef (vec2f *foo*) (vec2f *bar*))
+    ; foo = [3.0, 9.0]
+    ; bar = [0.0, 0.0]
+
+  "
+          (let ((default (coerce 0 ',element-type)))
+            (with-gensyms (vec xval yval x y)
+              (values `(,vec)
+                      `(,v)
+                      `(,xval ,yval)
+                      `(let* ((,x (or ,xval ,default))
+                              (,y (or ,yval ,x)))
+                        (setf (,vec-x ,vec) ,x
+                              (,vec-y ,vec) ,y)
+                        (values ,x ,y))
+                      `(values
+                        (,vec-x ,vec)
+                        (,vec-y ,vec))))))
+
+        ,(unless (subtypep element-type 'integer)
+           `(defun ,magdir (magnitude direction)
+             "Create a fresh vector with the given `magnitude` and `direction`."
+             ;; todo figure this out for integer vectors
+             (vec
+               (* magnitude (cos direction))
+               (* magnitude (sin direction)))))
 
         (defun ,eql (v1 v2 &optional epsilon)
           "Return whether `v1` and `v2` are componentwise `=`.
@@ -220,21 +385,25 @@
           (vec (wrap (+ (vec-x v1) (vec-x v2)))
                (wrap (+ (vec-y v1) (vec-y v2)))))
 
-        (defun ,add* (v x y)
+        (defun ,add* (v x &optional (y x))
           "Add `x` and `y` to the components of `v`, returning a new vector."
+          (declare (type ,element-type y))
           (vec (wrap (+ (vec-x v) x))
                (wrap (+ (vec-y v) y))))
 
         (defun ,add! (v1 v2)
           "Destructively update `v1` by adding `v2` componentwise, returning `v1`."
-          (setf (vec-x v1) (wrap (+ (vec-x v1) (vec-x v2)))
-                (vec-y v1) (wrap (+ (vec-y v1) (vec-y v2))))
+          (setf (,vec-type v1)
+                (values (wrap (+ (vec-x v1) (vec-x v2)))
+                        (wrap (+ (vec-y v1) (vec-y v2)))))
           v1)
 
-        (defun ,add*! (v x y)
+        (defun ,add*! (v x &optional (y x))
           "Destructively update `v` by adding `x` and `y`, returning `v`."
-          (setf (vec-x v) (wrap (+ (vec-x v) x))
-                (vec-y v) (wrap (+ (vec-y v) y)))
+          (declare (type ,element-type y))
+          (setf (,vec-type v)
+                (values (wrap (+ (vec-x v) x))
+                        (wrap (+ (vec-y v) y))))
           v)
 
         (defun ,sub (v1 v2)
@@ -242,21 +411,25 @@
           (vec (wrap (- (vec-x v1) (vec-x v2)))
                (wrap (- (vec-y v1) (vec-y v2)))))
 
-        (defun ,sub* (v x y)
+        (defun ,sub* (v x &optional (y x))
           "Subtract `x` and `y` from the components of `v`, returning a new vector."
+          (declare (type ,element-type y))
           (vec (wrap (- (vec-x v) x))
                (wrap (- (vec-y v) y))))
 
         (defun ,sub! (v1 v2)
           "Destructively update `v1` by subtracting `v2` componentwise, returning `v1`."
-          (setf (vec-x v1) (wrap (- (vec-x v1) (vec-x v2)))
-                (vec-y v1) (wrap (- (vec-y v1) (vec-y v2))))
+          (setf (,vec-type v1)
+                (values (wrap (- (vec-x v1) (vec-x v2)))
+                        (wrap (- (vec-y v1) (vec-y v2)))))
           v1)
 
-        (defun ,sub*! (v x y)
+        (defun ,sub*! (v x &optional (y x))
           "Destructively update `v` by subtracting `x` and `y`, returning `v`."
-          (setf (vec-x v) (wrap (- (vec-x v) x))
-                (vec-y v) (wrap (- (vec-y v) y)))
+          (declare (type ,element-type y))
+          (setf (,vec-type v)
+                (values (wrap (- (vec-x v) x))
+                        (wrap (- (vec-y v) y))))
           v)
 
         (defun ,mul (v scalar)
@@ -266,8 +439,9 @@
 
         (defun ,mul! (v scalar)
           "Destructively multiply the components of `v` by `scalar`, returning `v`."
-          (setf (vec-x v) (wrap (* (vec-x v) scalar))
-                (vec-y v) (wrap (* (vec-y v) scalar)))
+          (setf (,vec-type v)
+                (values (wrap (* (vec-x v) scalar))
+                        (wrap (* (vec-y v) scalar))))
           v)
 
         (defun ,div (v scalar)
@@ -277,8 +451,9 @@
 
         (defun ,div! (v scalar)
           "Destructively divide the components of `v` by `scalar`, returning `v`."
-          (setf (vec-x v) (wrap (// (vec-x v) scalar))
-                (vec-y v) (wrap (// (vec-y v) scalar)))
+          (setf (,vec-type v)
+                (values (wrap (// (vec-x v) scalar))
+                        (wrap (// (vec-y v) scalar))))
           v)
 
         (defuns (,magnitude ,length) (v)
@@ -290,32 +465,36 @@
           "Return the angle of `v`."
           (atan (vec-y v) (vec-x v)))
 
+        (defun ,abs (v)
+          "Take the absolute value of each component of `v`, returning a new vector."
+          (vec (wrap (abs (vec-x v)))
+               (wrap (abs (vec-y v)))))
+
+        (defun ,abs! (v)
+          "Destructively update the value of each component of `v` with its absolute value."
+          (setf (,vec-type v)
+                (values (wrap (abs (vec-x v)))
+                        (wrap (abs (vec-y v)))))
+          v)
+
         (define-swizzle ,vec-type x y)))))
 
 
 (defvec2ops vec2 real)
+
 (defvec2ops vec2f single-float)
 (defvec2ops vec2d double-float)
-(defvec2ops vec2i fixnum)
 
+(defvec2ops vec2i integer)
+(defvec2ops vec2s fixnum)
+(defvec2ops vec2u unsigned-fixnum)
 
-;;;; Scratch ------------------------------------------------------------------
-; (declaim (optimize (speed 3) (safety 1) (debug 1)))
-; (declaim (optimize (speed 3) (safety 0) (debug 0)))
-; vec2i-eql
-; vec2f-add
-; vec2f-add*
-; vec2f-add!
-; vec2f-add*!
-; vec2f-set!
-; vec2f-sub*!
-; vec2f-add!
-; vec2f-sub!
-; vec2f-mul!
-; vec2f-div
-; vec2f-mul
-; vec2f-yx
-; vec2f-yx!
-; vec2f
-; vec2f-div!
-; vec2f-unit-y
+(defvec2ops vec2u8 (unsigned-byte 8))
+(defvec2ops vec2u16 (unsigned-byte 16))
+(defvec2ops vec2u32 (unsigned-byte 32))
+(defvec2ops vec2u64 (unsigned-byte 64))
+
+(defvec2ops vec2s8 (signed-byte 8))
+(defvec2ops vec2s16 (signed-byte 16))
+(defvec2ops vec2s32 (signed-byte 32))
+(defvec2ops vec2s64 (signed-byte 64))
