@@ -25,8 +25,9 @@
   `(progn
      ,@(loop :for name :in names :collect `(defun ,name ,@rest))))
 
-(define-constant +setf-expander-help+
-  "Destructively set the components of `v` to particular values.
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (define-constant +setf-expander-help+
+    "Destructively set the components of `v` to particular values.
 
   The values should be given as a `(values ...)` form.
 
@@ -58,7 +59,7 @@
     ; bar = [0.0, 0.0]
 
   "
-  :test #'equal)
+    :test #'equal))
 
 
 (declaim (inline wrap-bounds))
