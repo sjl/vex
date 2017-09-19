@@ -1,4 +1,4 @@
-(asdf:defsystem #:vex
+(asdf:defsystem :vex
   :name "vex"
   :description "Yet another vector math library."
 
@@ -10,20 +10,21 @@
   :depends-on ()
 
   :serial t
-  :components ((:module "vendor"
-                :components ((:file "quickutils")))
+  :components ((:module "vendor" :serial t
+                :components ((:file "quickutils-package")
+                             (:file "quickutils")))
                (:file "package")
                (:module "src"
                 :serial t
                 :components ((:file "vectors"))))
 
-  :in-order-to ((asdf:test-op (asdf:test-op #:vex-test))))
+  :in-order-to ((asdf:test-op (asdf:test-op :vex-test))))
 
 
-(asdf:defsystem #:vex-test
+(asdf:defsystem :vex-test
   :name "vex-test"
 
-  :depends-on (#:1am)
+  :depends-on (:1am)
 
   :serial t
   :components ((:file "package-test")
@@ -33,4 +34,4 @@
 
   :perform (asdf:test-op
              (op system)
-             (uiop:symbol-call :vex-test :run-tests)))
+             (funcall (read-from-string "vex-test:run-tests"))))
